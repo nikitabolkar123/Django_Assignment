@@ -9,27 +9,38 @@ from user.serializers import RegistrationSerializer, LoginSerializer
 # Create your views here.
 class UserRegistration(APIView):
     serializer_class = RegistrationSerializer
-
+    """
+        class used to register for the user
+    """
     def post(self, request):
+        """
+            this method is used to create the user for the registration
+        """
         try:
             serializer = RegistrationSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            serializer.is_valid(raise_exception=True)  # if valid then deserialization
             serializer.save()
             return Response({"message": "User Registration Successfully", "status": 201, "data": serializer.data},
-                            status=status.HTTP_201_CREATED)
+                            status=201)
         except Exception as e:
-            return Response({"message": str(e), "status": 400, "data": {}}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e), "status": 400, "data": {}}, status=400)
 
     def get(self, request):
+        """
+            this method is used to retrieve the all registered users data
+        """
         try:
             user = User.objects.all()
             serializer = RegistrationSerializer(user, many=True)
-            return Response({"message": "Retrieve Data  Successfully", "status": 201, "data": serializer.data},
+            return Response({"message": "Retrieve Data  Successfully", "status": 200, "data": serializer.data},
                             status=200)
         except Exception as e:
-            return Response({"message": str(e), "status": 400, "data": {}}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e), "status": 400, "data": {}}, status=400)
 
     def put(self, request, user_id):
+        """
+                   this method is used to update user data
+               """
         try:
             post = User.objects.get(id=user_id)
             serializer = RegistrationSerializer(post, data=request.data)
@@ -41,6 +52,9 @@ class UserRegistration(APIView):
             return Response({"message": str(e), "status": 400, "data": {}}, status=400)
 
     def delete(self, request, user_id):
+        """
+                   this method is used to delete user
+               """
         try:
             books = User.objects.get(id=user_id)
             books.delete()
@@ -50,10 +64,16 @@ class UserRegistration(APIView):
             return Response({"message": str(e), "status": 400, "data": {}}, status=400)
 
 
-class Login(APIView):
+class UserLogin(APIView):
     serializer_class = LoginSerializer
+    """
+       class is used for the user login
+    """
 
     def post(self, request):
+        """
+            using the post method user can login by giving the credentials
+        """
         try:
             serializer = LoginSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -61,12 +81,19 @@ class Login(APIView):
             login(request, serializer.context.get('user'))
             return Response({"message": "Login Successful", "status": 201, "data": {}}, status=201)
         except Exception as e:
-            return Response({"message": str(e), "status": 400, "data": {}}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e), "status": 400, "data": {}}, status=400)
 
 
 class Logout(APIView):
+    """
+                using the get method user can logout by giving the credentials
+            """
     def get(self, request):
-        if request.user.is_authenticated:
-            logout(request)
-            return Response({"Message": "Logout Successfully"})
-        return Response({"Message": "User already logout"})
+        try:
+            if request.user.is_authenticated:
+                logout(request)
+                return Response({"Message": "Logout Successfully"})
+            else:
+                return Response({"Message": "you are not log in"})
+        except Exception as e:
+            return Response({"Message": "An error occurred during logout:{}".format(str(e))})
