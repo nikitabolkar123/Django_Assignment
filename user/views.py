@@ -42,8 +42,8 @@ class UserRegistration(APIView):
                    this method is used to update user data
                """
         try:
-            post = User.objects.get(id=user_id)
-            serializer = RegistrationSerializer(post, data=request.data)
+            user = User.objects.get(id=user_id)
+            serializer = RegistrationSerializer(user, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({"message": "Updated Successfully", "status": 200, "data": serializer.data},
@@ -56,8 +56,8 @@ class UserRegistration(APIView):
                    this method is used to delete user
                """
         try:
-            books = User.objects.get(id=user_id)
-            books.delete()
+            user = User.objects.get(id=user_id)
+            user.delete()
             return Response({"message": " deleted Successfully", "status": 200, "data": {}},
                             status=200)
         except Exception as e:

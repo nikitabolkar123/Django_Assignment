@@ -1,6 +1,6 @@
-# Create your views here.
-from django.db.models import Count, Q
+from django.db.models import Count
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Post, Like
 from .serializers import PostSerializer, LikeSerializer
 
-
+# Create your views here.
 class PostAPIView(APIView):
     """
             PostAPIView : POST ,GET, UPDATE, DELETE posts
@@ -47,7 +47,6 @@ class PostAPIView(APIView):
             post = Post.objects.get(id=post_id)
             if post.user != request.user:
                 raise PermissionDenied("You don't have permission to perform this action.")
-
             serializer = PostSerializer(post, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -87,8 +86,8 @@ class LikeAPIView(APIView):
 
     def get(self, request):
         try:
-            posts = Post.objects.all()
-            serializer = PostSerializer(posts, many=True)
+            like = Like.objects.all()
+            serializer = LikeSerializer(like, many=True)
             return Response({'message': 'data retrieved successfully', 'data': serializer.data, 'status': 200},
                             status=200)
         except Exception as e:
