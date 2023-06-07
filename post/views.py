@@ -36,7 +36,7 @@ class PostAPIView(APIView):
                     post['private'] = True if post['visibility'] == 'private' else False
                 else:
                     post['private'] = False
-                post.pop('visibility')  # Remove the 'visibility' field from the serialized data
+                post.pop('visibility')
             return Response({'message': 'data retrieved successfully', 'data': serialized_data, 'status': 200},
                             status=200)
         except Exception as e:
